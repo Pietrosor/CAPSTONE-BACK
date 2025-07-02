@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Entity
 @Table(name = "utenti")
@@ -27,4 +29,11 @@ public class Utente {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    @ManyToOne
+    @JoinColumn(name = "istruttore_id")
+    private Utente istruttore;
+
+    @OneToMany(mappedBy = "istruttore")
+    private List<Utente> clienti;
 }
