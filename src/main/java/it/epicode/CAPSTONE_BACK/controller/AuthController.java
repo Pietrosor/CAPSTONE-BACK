@@ -1,15 +1,15 @@
-package controller;
+package it.epicode.CAPSTONE_BACK.controller;
 
 
-import authentication.AuthService;
-import enumeration.Role;
+import it.epicode.CAPSTONE_BACK.authentication.AuthService;
+import it.epicode.CAPSTONE_BACK.enumeration.Role;
 import lombok.RequiredArgsConstructor;
-import model.Utente;
+import it.epicode.CAPSTONE_BACK.model.Utente;
 import org.springframework.web.bind.annotation.*;
-import payload.LoginRequest;
-import payload.SignupRequest;
-import payload.TokenResponse;
-import util.JwtUtil;
+import it.epicode.CAPSTONE_BACK.payload.LoginRequest;
+import it.epicode.CAPSTONE_BACK.payload.SignupRequest;
+import it.epicode.CAPSTONE_BACK.payload.TokenResponse;
+import it.epicode.CAPSTONE_BACK.util.JwtUtil;
 
 @RestController
 @RequestMapping("/api/auth")

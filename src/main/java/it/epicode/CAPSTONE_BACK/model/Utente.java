@@ -1,6 +1,6 @@
-package model;
+package it.epicode.CAPSTONE_BACK.model;
 
-import enumeration.Role;
+import it.epicode.CAPSTONE_BACK.enumeration.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

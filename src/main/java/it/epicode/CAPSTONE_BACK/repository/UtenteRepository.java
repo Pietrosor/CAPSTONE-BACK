@@ -1,6 +1,6 @@
-package repository;
+package it.epicode.CAPSTONE_BACK.repository;
 
-import model.Utente;
+import it.epicode.CAPSTONE_BACK.model.Utente;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

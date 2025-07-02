@@ -1,4 +1,4 @@
-package payload;
+package it.epicode.CAPSTONE_BACK.payload;
 
 import lombok.Data;
 

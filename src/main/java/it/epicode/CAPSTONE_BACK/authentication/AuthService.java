@@ -1,11 +1,11 @@
-package authentication;
+package it.epicode.CAPSTONE_BACK.authentication;
 
-import enumeration.Role;
+import it.epicode.CAPSTONE_BACK.enumeration.Role;
 import lombok.RequiredArgsConstructor;
-import model.Utente;
+import it.epicode.CAPSTONE_BACK.model.Utente;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import repository.UtenteRepository;
+import it.epicode.CAPSTONE_BACK.repository.UtenteRepository;
 
 @Service
 @RequiredArgsConstructor
