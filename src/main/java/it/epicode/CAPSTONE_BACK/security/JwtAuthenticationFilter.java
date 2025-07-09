@@ -33,7 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String path = request.getServletPath();
 
-        // 🚨 Evita di applicare il filtro su rotte pubbliche come login/signup
+
         if (path.startsWith("/api/auth")) {
             filterChain.doFilter(request, response);
             return;

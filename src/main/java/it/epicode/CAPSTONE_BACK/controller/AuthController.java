@@ -1,15 +1,18 @@
 package it.epicode.CAPSTONE_BACK.controller;
 
-
 import it.epicode.CAPSTONE_BACK.authentication.AuthService;
 import it.epicode.CAPSTONE_BACK.enumeration.Role;
 import lombok.RequiredArgsConstructor;
 import it.epicode.CAPSTONE_BACK.model.Utente;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import it.epicode.CAPSTONE_BACK.payload.LoginRequest;
 import it.epicode.CAPSTONE_BACK.payload.SignupRequest;
 import it.epicode.CAPSTONE_BACK.payload.TokenResponse;
-import it.epicode.CAPSTONE_BACK.util.JwtUtil;
+import it.epicode.CAPSTONE_BACK.service.JwtService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -17,32 +20,26 @@ import it.epicode.CAPSTONE_BACK.util.JwtUtil;
 public class AuthController {
 
     private final AuthService authService;
-    private final JwtUtil jwtUtil;
+    private final JwtService jwtService;
 
     @PostMapping("/signup")
-    public TokenResponse signup(@RequestBody SignupRequest req) {
+    public ResponseEntity<TokenResponse> signup(@RequestBody @Valid SignupRequest req) {
         Utente u = authService.register(
                 req.getUsername(),
                 req.getPassword(),
                 Role.valueOf(req.getRole().toUpperCase())
         );
 
-        String token = jwtUtil.generateToken(u.getUsername());
-        return new TokenResponse(token, u.getUsername(), u.getRole().name());
+        String token = jwtService.generateToken(u);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new TokenResponse(token, u.getUsername(), u.getRole().name()));
     }
 
     @PostMapping("/login")
-    public TokenResponse login(@RequestBody LoginRequest req) {
+    public ResponseEntity<TokenResponse> login(@RequestBody @Valid LoginRequest req) {
         Utente u = authService.authenticate(req.getUsername(), req.getPassword());
 
-        String token = jwtUtil.generateToken(u.getUsername());
-        return new TokenResponse(token, u.getUsername(), u.getRole().name());
+        String token = jwtService.generateToken(u);
+        return ResponseEntity.ok(new TokenResponse(token, u.getUsername(), u.getRole().name()));
     }
 
-    @GetMapping("/me")
-    public Utente me(@RequestHeader("Authorization") String authHeader) {
-        String jwt = authHeader.replace("Bearer ", "");
-        String username = jwtUtil.extractUsername(jwt);
-        return authService.loadByUsername(username);
-    }
 }
