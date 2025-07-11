@@ -7,17 +7,16 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import it.epicode.CAPSTONE_BACK.dto.ClienteDto;
-import it.epicode.CAPSTONE_BACK.dto.SchedaDto;
 import it.epicode.CAPSTONE_BACK.dto.CreazioneSchedaDto;
 import it.epicode.CAPSTONE_BACK.dto.EsercizioDto;
+import it.epicode.CAPSTONE_BACK.dto.SchedaDto;
 import it.epicode.CAPSTONE_BACK.model.Utente;
 import it.epicode.CAPSTONE_BACK.service.UtenteService;
-import it.epicode.CAPSTONE_BACK.service.SchedaService;
 import it.epicode.CAPSTONE_BACK.service.EsercizioService;
+import it.epicode.CAPSTONE_BACK.service.SchedaService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-//@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api/istruttore")
 @RequiredArgsConstructor
 public class IstruttoreController {
@@ -32,6 +31,21 @@ public class IstruttoreController {
     ) {
         List<ClienteDto> clienti = utenteService.listaClienti(user.getUsername());
         return ResponseEntity.ok(clienti);
+    }
+
+    @GetMapping("/clienti/liberi")
+    public ResponseEntity<List<ClienteDto>> getClientiLiberi() {
+        List<ClienteDto> liberi = utenteService.listaClientiSenzaIstruttore();
+        return ResponseEntity.ok(liberi);
+    }
+
+    @PostMapping("/clienti/{clienteId}/assegna")
+    public ResponseEntity<Void> assegnaCliente(
+            @AuthenticationPrincipal Utente user,
+            @PathVariable Long clienteId
+    ) {
+        utenteService.assegnaClienteAlIstruttore(clienteId, user.getUsername());
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/clienti/{clienteId}/scheda")

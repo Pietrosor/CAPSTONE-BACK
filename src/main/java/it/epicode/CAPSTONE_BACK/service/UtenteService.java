@@ -1,4 +1,3 @@
-// UtenteService.java
 package it.epicode.CAPSTONE_BACK.service;
 
 import java.util.List;
@@ -12,4 +11,8 @@ public interface UtenteService {
     List<ClienteDto> listaClienti(String istruttoreUsername);
 
     String findUsernameById(Long id);
+
+    List<ClienteDto> listaClientiSenzaIstruttore();
+
+    void assegnaClienteAlIstruttore(Long clienteId, String usernameIstruttore);
 }
