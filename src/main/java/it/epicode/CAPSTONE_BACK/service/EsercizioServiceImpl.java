@@ -23,6 +23,7 @@ public class EsercizioServiceImpl implements EsercizioService {
                 .uri(uri -> uri.path("/exercises").queryParam("name", keyword).build())
                 .retrieve()
                 .bodyToFlux(EsercizioDto.class)
+
                 .collectList()
                 .block();
     }

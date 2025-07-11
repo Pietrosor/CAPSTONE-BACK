@@ -1,19 +1,17 @@
 package it.epicode.CAPSTONE_BACK.security;
 
+import it.epicode.CAPSTONE_BACK.service.JwtService;
+import it.epicode.CAPSTONE_BACK.model.Utente;
 import it.epicode.CAPSTONE_BACK.authentication.AuthService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import it.epicode.CAPSTONE_BACK.service.JwtService;
-
-
-import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
@@ -21,19 +19,19 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+
     private final JwtService jwtService;
     private final AuthService authService;
 
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
+        System.out.println("[JWT FILTER] path=" + request.getServletPath());
+        System.out.println("[JWT FILTER] authHeader=" + request.getHeader("Authorization"));
 
         String path = request.getServletPath();
-
-
         if (path.startsWith("/api/auth")) {
             filterChain.doFilter(request, response);
             return;
@@ -49,10 +47,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String username = jwtService.extractUsername(token);
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = authService.loadByUsername(username);
+            Utente user = authService.loadByUsername(username);
 
-            if (jwtService.isTokenValid(token, userDetails)) {
-                var auth = jwtService.buildAuthentication(userDetails);
+            if (jwtService.isTokenValid(token, user)) {
+                var auth = jwtService.buildAuthentication(user);
+                auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }

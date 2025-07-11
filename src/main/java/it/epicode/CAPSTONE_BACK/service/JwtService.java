@@ -3,12 +3,13 @@ package it.epicode.CAPSTONE_BACK.service;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import it.epicode.CAPSTONE_BACK.model.Utente;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
+
 import java.security.Key;
 import java.util.*;
 import java.util.function.Function;
@@ -28,12 +29,12 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-        public String generateToken(UserDetails userDetails) {
+    public String generateToken(Utente u) {
         return Jwts.builder()
-                .setSubject(userDetails.getUsername())
-                .claim("authorities", userDetails.getAuthorities())
+                .setSubject(u.getUsername())
+                .claim("role", List.of(u.getRole().name()))
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 24h
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

@@ -1,7 +1,7 @@
+// UtenteServiceImpl.java
 package it.epicode.CAPSTONE_BACK.service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -20,7 +20,7 @@ public class UtenteServiceImpl implements UtenteService {
     @Override
     public ProfiloUtenteDto getProfilo(String username) {
         Utente u = utenteRepo.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+                .orElseThrow(() -> new RuntimeException("Utente non trovato: " + username));
         return ProfiloUtenteDto.builder()
                 .id(u.getId())
                 .username(u.getUsername())
@@ -30,18 +30,15 @@ public class UtenteServiceImpl implements UtenteService {
 
     @Override
     public List<ClienteDto> listaClienti(String istruttoreUsername) {
-        Utente istr = utenteRepo.findByUsername(istruttoreUsername)
-                .orElseThrow(() -> new RuntimeException("Istruttore non trovato"));
-        return utenteRepo.findByIstruttoreId(istr.getId())
-                .stream()
-                .map(c -> new ClienteDto(c.getId(), c.getUsername()))
-                .collect(Collectors.toList());
+        Utente istruttore = utenteRepo.findByUsername(istruttoreUsername)
+                .orElseThrow(() -> new RuntimeException("Istruttore non trovato: " + istruttoreUsername));
+        return utenteRepo.findClientiByIstruttoreId(istruttore.getId());
     }
 
     @Override
     public String findUsernameById(Long id) {
         return utenteRepo.findById(id)
                 .map(Utente::getUsername)
-                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+                .orElseThrow(() -> new RuntimeException("Utente non trovato con ID: " + id));
     }
 }
