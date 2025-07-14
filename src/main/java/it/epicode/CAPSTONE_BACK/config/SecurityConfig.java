@@ -4,6 +4,7 @@ import it.epicode.CAPSTONE_BACK.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -26,7 +27,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://localhost:5173"));
-        config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
@@ -36,22 +37,39 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(
-            org.springframework.security.config.annotation.web.builders.HttpSecurity http
-    ) throws Exception {
+    public SecurityFilterChain filterChain(org.springframework.security.config.annotation.web.builders.HttpSecurity http)
+            throws Exception {
         http
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
+
+
                 .sessionManagement(sm ->
-                        sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+
+
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/istruttore/**").hasRole("ISTRUTTORE")
-                        .requestMatchers("/api/cliente/**").hasRole("CLIENTE")
+
+                        .requestMatchers("/api/istruttore/debug").permitAll()
+
+                        .requestMatchers("/api/istruttore/clienti/**")
+                        .hasRole("ISTRUTTORE")
+
+                        .requestMatchers(HttpMethod.GET, "/api/istruttore/**")
+                        .hasRole("ISTRUTTORE")
+
+                        .requestMatchers("/api/cliente/**")
+                        .hasRole("CLIENTE")
+
+                        .requestMatchers("/error","/error/**").permitAll()
+
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class);
+
+
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
