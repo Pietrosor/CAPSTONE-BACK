@@ -30,7 +30,7 @@ public class SchedaAllenamento {
     @JoinColumn(name = "istruttore_id", nullable = false)
     private Utente istruttore;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id", nullable = false)
     private Utente cliente;
 

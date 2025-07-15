@@ -19,4 +19,6 @@ public interface SchedaService {
             String esercizioId
     );
     List<SchedaDto> getSchedeClienteById(Long clienteId);
+
+    SchedaDto assegnaSchedaACliente(Long schedaId, Long clienteId);
 }

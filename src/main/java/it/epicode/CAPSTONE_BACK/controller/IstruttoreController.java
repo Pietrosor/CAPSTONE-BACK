@@ -94,6 +94,11 @@ public class IstruttoreController {
         List<SchedaDto> schede = schedaService.getSchedeClienteById(clienteId);
         return ResponseEntity.ok(schede);
     }
-
-
+    @PutMapping("/schede/{schedaId}/cliente/{clienteId}")
+    public ResponseEntity<SchedaDto> assegna(
+            @PathVariable Long schedaId,
+            @PathVariable Long clienteId) {
+        SchedaDto dto = schedaService.assegnaSchedaACliente(schedaId, clienteId);
+        return ResponseEntity.ok(dto);
+    }
 }

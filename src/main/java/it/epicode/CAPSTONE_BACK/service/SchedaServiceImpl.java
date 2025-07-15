@@ -27,6 +27,7 @@ public class SchedaServiceImpl implements SchedaService {
     private final SchedaAllenamentoRepository schedaRepo;
     private final EsercizioRepository esercizioRepo;
 
+
     @Transactional
     public SchedaDto creaScheda(String istruttoreUser,
                                 Long clienteId,
@@ -54,6 +55,21 @@ public class SchedaServiceImpl implements SchedaService {
         schedaRepo.save(s);
         return mapToDto(s);
     }
+    @Transactional
+    public SchedaDto assegnaSchedaACliente(Long schedaId, Long clienteId) {
+        SchedaAllenamento scheda = schedaRepo.findById(schedaId)
+                .orElseThrow(() -> new EntityNotFoundException("Scheda non trovata"));
+        Utente cliente = utenteRepo.findById(clienteId)
+                .orElseThrow(() -> new EntityNotFoundException("Cliente non trovato"));
+
+        scheda.setCliente(cliente);
+        SchedaAllenamento saved = schedaRepo.save(scheda);
+        cliente.getSchede().add(saved);
+
+        return mapToDto(saved);
+    }
+
+
 
     @Override
     public List<SchedaDto> getSchedeCliente(String clienteUser) {
