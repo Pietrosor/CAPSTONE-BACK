@@ -89,4 +89,11 @@ public class IstruttoreController {
         );
         return ResponseEntity.ok(scheda);
     }
+    public ResponseEntity<List<SchedaDto>> getSchedePerCliente(
+            @PathVariable Long clienteId) {
+        List<SchedaDto> schede = schedaService.getSchedeClienteById(clienteId);
+        return ResponseEntity.ok(schede);
+    }
+
+
 }

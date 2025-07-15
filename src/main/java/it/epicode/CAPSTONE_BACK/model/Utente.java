@@ -4,6 +4,7 @@ import it.epicode.CAPSTONE_BACK.enumeration.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -41,6 +42,15 @@ public class Utente implements UserDetails {
 
     @OneToMany(mappedBy = "istruttore")
     private List<Utente> clienti;
+
+    @OneToMany(
+            mappedBy = "cliente",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<SchedaAllenamento> schede = new ArrayList<>();
+
+
 
     // ====== METODI UserDetails ======
 

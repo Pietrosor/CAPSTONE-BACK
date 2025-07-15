@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import it.epicode.CAPSTONE_BACK.model.Esercizio;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import it.epicode.CAPSTONE_BACK.dto.CreazioneSchedaDto;
@@ -24,22 +27,27 @@ public class SchedaServiceImpl implements SchedaService {
     private final SchedaAllenamentoRepository schedaRepo;
     private final EsercizioRepository esercizioRepo;
 
-    @Override
-    public SchedaDto creaScheda(String istruttoreUser, Long clienteId, CreazioneSchedaDto dto) {
-        Utente istr = utenteRepo.findByUsername(istruttoreUser).orElseThrow();
-        Utente client = utenteRepo.findById(clienteId).orElseThrow();
+    @Transactional
+    public SchedaDto creaScheda(String istruttoreUser,
+                                Long clienteId,
+                                CreazioneSchedaDto dto) {
+        Utente istr = utenteRepo.findByUsername(istruttoreUser)
+                .orElseThrow(() -> new EntityNotFoundException("Istruttore non trovato"));
+        Utente client = utenteRepo.findById(clienteId)
+                .orElseThrow(() -> new EntityNotFoundException("Cliente non trovato"));
 
-        SchedaAllenamento s = SchedaAllenamento.builder()
-                .titolo(dto.getTitolo())
-                .descrizione(dto.getDescrizione())
-                .dataCreazione(LocalDateTime.now())
-                .istruttore(istr)
-                .cliente(client)
-                .build();
+        SchedaAllenamento s = new SchedaAllenamento();
+        s.setTitolo(dto.getTitolo());
+        s.setDescrizione(dto.getDescrizione());
+        s.setIstruttore(istr);
+        s.setCliente(client);
 
         if (dto.getEserciziIds() != null) {
-            dto.getEserciziIds().forEach(id -> {
-                esercizioRepo.findById(id).ifPresent(s.getEsercizi()::add);
+            dto.getEserciziIds().forEach(externalId -> {
+                Esercizio ex = esercizioRepo.findById(externalId)
+                        .orElseThrow(() -> new EntityNotFoundException(
+                                "Esercizio non trovato: " + externalId));
+                s.getEsercizi().add(ex);
             });
         }
 
@@ -65,15 +73,32 @@ public class SchedaServiceImpl implements SchedaService {
     }
 
     private SchedaDto mapToDto(SchedaAllenamento s) {
-        List<EsercizioDto> es = s.getEsercizi().stream()
-                .map(e -> new EsercizioDto(e.getId(), e.getName(), e.getBodyPart(), e.getEquipment(), e.getGifUrl()))
-                .collect(Collectors.toList());
+        List<EsercizioDto> lista = s.getEsercizi().stream()
+                .map(e -> new EsercizioDto(
+                        e.getId(),
+                        e.getName(),
+                        e.getBodyPart(),
+                        e.getEquipment(),
+                        e.getGifUrl()))
+                .toList();
+
         return SchedaDto.builder()
                 .id(s.getId())
                 .titolo(s.getTitolo())
                 .descrizione(s.getDescrizione())
                 .dataCreazione(s.getDataCreazione())
-                .esercizi(es)
+                .esercizi(lista)
                 .build();
     }
+    @Override
+    public List<SchedaDto> getSchedeClienteById(Long clienteId) {
+        utenteRepo.findById(clienteId)
+                .orElseThrow(() -> new EntityNotFoundException("Cliente non trovato"));
+        return schedaRepo
+                .findByClienteIdOrderByDataCreazioneDesc(clienteId)
+                .stream()
+                .map(this::mapToDto)
+                .toList();
+    }
+
 }
