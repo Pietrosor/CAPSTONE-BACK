@@ -25,6 +25,7 @@ public class IstruttoreController {
     private final SchedaService schedaService;
     private final EsercizioService esercizioService;
 
+
     @GetMapping("/clienti")
     public ResponseEntity<List<ClienteDto>> listaClienti(
             @AuthenticationPrincipal Utente user
@@ -63,10 +64,29 @@ public class IstruttoreController {
             @PathVariable Long clienteId,
             @RequestBody CreazioneSchedaDto dto
     ) {
-        SchedaDto scheda = schedaService.creaScheda(
-                user.getUsername(), clienteId, dto
-        );
-        return ResponseEntity.ok(scheda);
+        try {
+            System.out.println("=== CREAZIONE SCHEDA DEBUG ===");
+            System.out.println("User: " + (user != null ? user.getUsername() : "NULL"));
+            System.out.println("ClienteId: " + clienteId);
+            System.out.println("DTO: " + dto);
+            System.out.println("Titolo: " + dto.getTitolo());
+            System.out.println("Descrizione: " + dto.getDescrizione());
+            System.out.println("EserciziIds: " + dto.getEserciziIds());
+
+            SchedaDto scheda = schedaService.creaScheda(
+                    user.getUsername(), clienteId, dto
+            );
+
+            System.out.println("Scheda creata con successo: " + scheda.getId());
+            return ResponseEntity.ok(scheda);
+
+        } catch (Exception e) {
+            System.err.println("ERRORE NELLA CREAZIONE SCHEDA:");
+            System.err.println("Messaggio: " + e.getMessage());
+            System.err.println("Tipo: " + e.getClass().getSimpleName());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @GetMapping("/esercizi/search")
@@ -89,6 +109,7 @@ public class IstruttoreController {
         );
         return ResponseEntity.ok(scheda);
     }
+    @GetMapping("/clienti/{clienteId}/schede")
     public ResponseEntity<List<SchedaDto>> getSchedePerCliente(
             @PathVariable Long clienteId) {
         List<SchedaDto> schede = schedaService.getSchedeClienteById(clienteId);
@@ -101,4 +122,6 @@ public class IstruttoreController {
         SchedaDto dto = schedaService.assegnaSchedaACliente(schedaId, clienteId);
         return ResponseEntity.ok(dto);
     }
+
+
 }

@@ -14,7 +14,7 @@ import it.epicode.CAPSTONE_BACK.service.JwtService;
 
 import jakarta.validation.Valid;
 
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173"})
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
